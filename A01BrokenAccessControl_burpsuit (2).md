@@ -1,3 +1,4 @@
+<img width="2559" height="1439" alt="Screenshot 2026-07-18 102711" src="https://github.com/user-attachments/assets/26b0a5c7-b884-42eb-a26e-a77938c8bd6d" />
 ## Мета: Знайомство з A01:2025 Broken Access Control
 
 ### Середовище: Kali Linux, Docker engine, OWASP WebGoat container.
@@ -29,24 +30,27 @@
 У цьому уроці ми намагаємося передбачити значення **hijack_cookie**. Цей параметр використовується сервером, щоб розрізняти автентифікованих та анонімних користувачів WebGoat.
 
 У формі **Account Access** вводимо облікові дані іншого користувача (у моєму випадку — **student2**) та тиснемо **Access**. Отримуємо повідомлення *"Sorry the solution is not correct, please try again."* — очікувано, адже мета уроку не в звичайному логіні, а в підборі кукі.
+<img width="2559" height="1437" alt="Screenshot 2026-07-18 103246" src="https://github.com/user-attachments/assets/6cbe7395-b442-4b47-8e0b-9bd580751a6f" />
 
-![login attempt](images/Screenshot_2026-07-18_102711.png)
+<img width="2559" height="1439" alt="Screenshot 2026-07-18 102711" src="https://github.com/user-attachments/assets/3c219417-ae1e-44da-aed4-71933e7f19b4" />
 
 ### Крок 2. Шукаємо потрібний запит у Burp Suite
 
 Паралельно з переглядом сторінки в браузері запускаємо **Burp Suite Community Edition v2026.3.2**, вкладка **Proxy → HTTP history**. Оскільки трафік вже проходить через проксі, у списку одразу видно всі запити до `127.0.0.1:8080`, включно з `/WebGoat/login`, `/WebGoat/service/lessonmenu.mvc` та іншими сервісними викликами.
 
-![HTTP history overview](images/Screenshot_2026-07-18_103246.png)
+[Uploading Screenshot 2026-07-18 103246.png…]()
+
 
 Серед історії шукаємо саме той запит, що відповідає нашій спробі логіну на другому кроці — **POST /WebGoat/HijackSession/login**. У відповіді (**Response**) сервера видно заголовок:
 
 ```
 Set-Cookie: hijack_cookie=9109338559187567653-1784359778919; Path=/WebGoat; Secure
 ```
+<img width="2553" height="1398" alt="Screenshot 2026-07-18 103408" src="https://github.com/user-attachments/assets/31e17448-4231-419f-9d5c-9ee2037bfd54" />
 
 Саме значення `hijack_cookie` — це і є той ключ, який нам потрібно "передбачити", щоб перехопити чужу сесію.
+<img width="2541" height="1369" alt="Screenshot 2026-07-18 103851" src="https://github.com/user-attachments/assets/7b936c64-ce9d-4679-8c23-9d6d2947c00a" />
 
-![request and response with hijack_cookie](images/Screenshot_2026-07-18_103408.png)
 
 ### Крок 3. Відправляємо запит у Repeater
 
@@ -56,7 +60,6 @@ Set-Cookie: hijack_cookie=9109338559187567653-1784359778919; Path=/WebGoat; Secu
 
 Кожного разу сервер повертає новий `hijack_cookie` у заголовку `Set-Cookie`, а весь список повторних запитів зберігається зліва, тож можна швидко проходитись по історії й фіксувати значення.
 
-![Repeater multiple requests](images/Screenshot_2026-07-18_103851.png)
 
 ### Крок 4. Аналізуємо отримані значення
 
@@ -74,8 +77,8 @@ Set-Cookie: hijack_cookie=9109338559187567653-1784359778919; Path=/WebGoat; Secu
 9109338559187567664-1784360280336
 9109338559187567665-1784360280738
 ```
+<img width="1587" height="630" alt="Screenshot 2026-07-18 104137" src="https://github.com/user-attachments/assets/60ce9f8e-afb7-4a5e-9ab6-ae84b3463ebb" />
 
-![hijack_cookie values in Mousepad](images/Screenshot_2026-07-18_104137.png)
 
 Навіть поверхневий аналіз дає висновок про логіку створення кукі: перша частина — це порядковий номер сесії (session id), який щоразу збільшується приблизно на одиницю, а друга частина, після дефіса, — це **часова мітка (timestamp)** у мілісекундах.
 
@@ -89,12 +92,14 @@ Set-Cookie: hijack_cookie=9109338559187567653-1784359778919; Path=/WebGoat; Secu
 
 Запускаємо **Start attack** і чекаємо результатів перебору. Оскільки діапазон значень, у якому міг опинитись пропущений `hijack_cookie`, досить вузький (він обмежений сусідніми перехопленими значеннями), позитивний результат знаходиться дуже швидко — у списку результатів видно рядок, що відрізняється від інших довжиною відповіді (Length) або статус-кодом, що і вказує на вдалу підстановку.
 
-![Intruder attack results](intruder_results.png)
+<img width="1012" height="766" alt="Screenshot 2026-07-27 171055" src="https://github.com/user-attachments/assets/fb969567-26f3-461e-a4c3-5ae9e53a049a" />
+
 
 ### Крок 6. Перевіряємо результат у WebGoat
 
 Повертаємось на вкладку завдання в браузері — і бачимо, що вона змінила колір з червоного на зелений, що підтверджує успішне виконання уроку.
 
-![completed lesson - green tab](completed_lesson.png)
+<img width="1013" height="400" alt="Screenshot 2026-07-27 171124" src="https://github.com/user-attachments/assets/4172f850-8098-414f-8cc7-f5d29b9961f5" />
+
 
 Вітання, завдання пройдено!
