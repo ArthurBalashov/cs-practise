@@ -1,3 +1,4 @@
+<img width="1475" height="736" alt="preview (1)" src="https://github.com/user-attachments/assets/ab2187c6-6bd2-46f9-be88-62e450dbbbaa" />
 # Звіт з лабораторної роботи: Insecure Direct Object References (IDOR)
 
 **Виконав:** студент
@@ -48,11 +49,13 @@
 
 Ідея цього кроку — подивитись, чи не повертає сервер у відповіді більше даних, ніж показує інтерфейс. Натиснув **View Profile**: на сторінці з'явилися лише `name`, `color` та `size`. Далі потрібно було вказати, яких два поля немає на екрані, хоча вони реально приходять від сервера.
 
-![Перегляд профілю у WebGoat: name/color/size на екрані, поля role та userId приховані](screenshots/webgoat-view-profile.png)
+<img width="1235" height="952" alt="preview" src="https://github.com/user-attachments/assets/1ee27d27-1aa0-46df-b737-68fc48ad92f4" />
+
 
 Щоб перевірити здогадку, відкрив історію запитів у Burp Suite (Proxy → HTTP history) і подивився на «сирий» JSON, який реально прийшов від сервера у відповідь на `GET /WebGoat/IDOR/profile`. Крім видимих на сторінці полів, у відповіді присутні ще `role` та `userId` — саме те, що не відображається на екрані:
 
-![Burp Suite: сира відповідь /WebGoat/IDOR/profile з полями role та userId](screenshots/burp-raw-response.png)
+<img width="1475" height="736" alt="preview (1)" src="https://github.com/user-attachments/assets/0a51b83b-ce6f-4525-a057-ec328b5b6a0c" />
+
 
 Ввівши `role, userId` як відповідь, отримав підтвердження, що крок пройдено правильно (видно на скріншоті вище).
 
@@ -62,7 +65,8 @@
 
 Перевірив це через Burp: відправив `GET /WebGoat/IDOR/profile` без будь-якого ідентифікатора в шляху — сервер повернув порожній об'єкт `{}`. Це підтверджує, що без явного ID сервер не знає, чий профіль віддавати, і потрібен додатковий сегмент шляху або параметр:
 
-![Burp Suite: GET /WebGoat/IDOR/profile повертає порожній JSON {}](screenshots/burp-empty-response.png)
+<img width="1010" height="1176" alt="preview (2)" src="https://github.com/user-attachments/assets/51b4a0c3-09c6-4ee3-a7b3-c9ec031d749e" />
+
 
 ### Крок 4. Перегляд чужого профілю
 
