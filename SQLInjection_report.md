@@ -44,7 +44,8 @@ SQL-ін'єкція — це вбудовування довільного SQL-�
 SELECT department FROM employees WHERE first_name = 'Bob' AND last_name = 'Franco';
 ```
 
-![Урок SQL Injection (intro): теорія та перше завдання на SELECT](screenshots/sql-intro-practice.png)
+<img width="1014" height="306" alt="Screenshot 2026-07-28 182516" src="https://github.com/user-attachments/assets/4122887e-2632-4098-98ff-8cc8bdf83afd" />
+
 
 ### Крок 2. DML — зміна чужих даних через UPDATE
 
@@ -54,7 +55,8 @@ SELECT department FROM employees WHERE first_name = 'Bob' AND last_name = 'Franc
 UPDATE employees SET department = 'Sales' WHERE first_name = 'Tobi' AND last_name = 'Barnett';
 ```
 
-![image-1](image-1.png)
+<img width="583" height="365" alt="image12" src="https://github.com/user-attachments/assets/ecafb8db-c6c3-4503-a70a-9be68c2dea60" />
+
 
 ### Крок 3. DDL — зміна структури таблиці
 
@@ -64,7 +66,8 @@ UPDATE employees SET department = 'Sales' WHERE first_name = 'Tobi' AND last_nam
 ALTER TABLE employees ADD phone varchar(20);
 ```
 
-![Data Definition Language: успішне виконання ALTER TABLE ADD phone](screenshots/ddl-alter-table-success.png)
+<img width="853" height="1180" alt="123" src="https://github.com/user-attachments/assets/ae812320-3d95-476a-9c56-16cbb3282478" />
+
 
 Цей крок добре ілюструє, чому DDL-ін'єкція небезпечніша за звичайну DML: зловмисник тут працює не з окремими значеннями, а зі схемою бази в цілому — може додати службові поля для збору даних або видалити критично важливі індекси.
 
@@ -76,7 +79,8 @@ DCL відповідає за керування доступом, тож тут
 GRANT ALL ON grant_rights TO unauthorized_user;
 ```
 
-![Data Control Language: успішне виконання GRANT ALL](screenshots/dcl-grant-success.png)
+<img width="613" height="655" alt="Screenshot 2026-07-25 190626" src="https://github.com/user-attachments/assets/8a28b4c6-e4b0-490c-8454-0467a04e6fb6" />
+
 
 Три попередні кроки разом добре показують ключову ідею уроку: DML, DDL і DCL-ін'єкції б'ють по різних сторонах тріади CIA — конфіденційність (через SELECT), цілісність (через UPDATE/ALTER) і доступність (через DROP/REVOKE) можуть постраждати незалежно одна від одної.
 
@@ -93,8 +97,9 @@ SELECT * FROM user_data WHERE first_name = 'John' AND last_name = '" + lastName 
 ```
 Smith' or '1' = '1
 ```
+<img width="634" height="1152" alt="32" src="https://github.com/user-attachments/assets/45257be1-d015-4f87-a379-2455f6cee529" />
 
-![Рядкова SQL-ін'єкція: успішне отримання всіх записів з user_data](screenshots/string-injection-success.png)
+
 
 Після виконання запит фактично перетворився на `... WHERE (first_name = 'John' and last_name = 'Smith') or (TRUE)`, і оскільки права частина умови завжди істинна, база повернула геть усі рядки, ігноруючи фільтр за іменем.
 
@@ -112,7 +117,8 @@ SELECT * FROM user_data WHERE login_count = " + Login_Count + " AND userid = " +
 User_Id: 1 OR 1=1
 ```
 
-![Числова SQL-ін'єкція: успішне отримання всіх записів разом із номерами карток](screenshots/numeric-injection-success.png)
+<img width="575" height="900" alt="53" src="https://github.com/user-attachments/assets/eeaaa651-bc7e-47c0-a450-6bc09988639e" />
+
 
 На відміну від рядкової ін'єкції, тут не потрібно закривати лапки — значення підставляється в запит напряму як число, тож `OR 1=1` одразу робить умову `WHERE` істинною для кожного рядка таблиці. У відповіді, крім іншого, з'явилися номери кредитних карток користувачів — наочний приклад того, наскільки чутливі дані можуть «вилетіти» через таку ін'єкцію.
 
@@ -126,7 +132,8 @@ SELECT * FROM employees WHERE last_name = '" + name + "' AND auth_tan = '" + aut
 
 Задача — побачити зарплати всіх колег, не знаючи їхніх TAN-кодів. Оскільки умова побудована через `AND`, досить було «перебити» логіку оператором `OR`, щоб права частина стала завжди істинною і TAN узагалі перестав відігравати роль.
 
-![image-6](image-6.png)
+<img width="613" height="986" alt="64" src="https://github.com/user-attachments/assets/5afc8b10-f8c3-4297-af03-c812e402d3c5" />
+
 
 ### Крок 8. Порушення цілісності — ланцюжок запитів (query chaining)
 
@@ -148,7 +155,8 @@ Smith'; UPDATE employees SET salary = '999999' WHERE last_name = 'Smith' --
 Smith'; DROP TABLE access_log --
 ```
 
-![Компрометація доступності: успішне видалення таблиці access_log](screenshots/availability-drop-table-success.png)
+<img width="896" height="758" alt="Screenshot 2026-07-25 191548" src="https://github.com/user-attachments/assets/b0df6b00-840c-4f39-899f-f2ef5472ef5d" />
+
 
 Тут спрацював той самий принцип, що й у попередньому кроці, тільки замість `UPDATE` після крапки з комою виконався `DROP TABLE`, який повністю знищив таблицю логів. Після цього в системі просто не залишилось джерела, за яким можна відновити, хто і коли змінював зарплату — доступність цих даних втрачена остаточно.
 
